@@ -347,8 +347,10 @@
     }
 
     /* ---------- Links ---------- */
+    @property --a { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+
     .links {
-      --d: 0.24s;
+      --d: 0.28s;
       width: 100%;
       display: flex;
       flex-direction: column;
@@ -356,6 +358,8 @@
     }
 
     .link-btn {
+      --c1: var(--accent); --c2: #6c5ce7; --c3: var(--accent);
+      --tint: rgba(140, 120, 255, 0.10);
       position: relative;
       overflow: hidden;
       display: flex;
@@ -363,7 +367,9 @@
       gap: 13px;
       padding: 12px 16px;
       border-radius: 18px;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.03));
+      background:
+        linear-gradient(135deg, var(--tint), transparent 65%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.03));
       border: 1px solid var(--glass-border);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
@@ -374,6 +380,25 @@
       letter-spacing: 0.5px;
       transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.3s ease;
     }
+
+    /* rotating neon border in brand colors */
+    .link-btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 18px;
+      padding: 1.5px;
+      background: conic-gradient(from var(--a), var(--c1), var(--c2), var(--c3), var(--c1));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      animation: border-spin 6s linear infinite;
+      opacity: 0.55;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    @keyframes border-spin { to { --a: 360deg; } }
 
     .link-btn::before {
       content: '';
@@ -387,6 +412,7 @@
     }
 
     .link-btn:hover::before, .link-btn:active::before { left: 130%; }
+    .link-btn:hover::after, .link-btn:active::after { opacity: 1; }
     .link-btn:hover, .link-btn:active { transform: translateY(-3px) scale(1.01); }
 
     .link-icon {
@@ -404,31 +430,97 @@
     .link-btn:hover .link-icon { transform: scale(1.08) rotate(-4deg); }
     .link-icon svg { width: 21px; height: 21px; }
 
+    .btn-ig { --c1: #f9ce34; --c2: #ee2a7b; --c3: #6228d7; --tint: rgba(238, 42, 123, 0.12); }
     .btn-ig .link-icon { background: linear-gradient(45deg, #f9ce34, #ee2a7b, #6228d7); }
     .btn-ig:hover, .btn-ig:active {
       border-color: rgba(238, 42, 123, 0.5);
-      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.5), 0 0 28px rgba(238, 42, 123, 0.28);
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.5), 0 0 30px rgba(238, 42, 123, 0.35);
     }
 
-    .btn-tg .link-icon { background: linear-gradient(135deg, #37aee2, #1e96c8); }
+    .btn-tg { --c1: #37aee2; --c2: #7ee0ff; --c3: #1e96c8; --tint: rgba(55, 174, 226, 0.12); }
+    .btn-tg .link-icon { background: linear-gradient(135deg, #4fc3f7, #1e96c8); }
     .btn-tg:hover, .btn-tg:active {
       border-color: rgba(55, 174, 226, 0.5);
-      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.5), 0 0 28px rgba(55, 174, 226, 0.3);
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.5), 0 0 30px rgba(55, 174, 226, 0.38);
     }
 
-    .btn-ch .link-icon { background: linear-gradient(135deg, #9a86ff, #6c5ce7); }
+    .btn-ch { --c1: #ff3b3b; --c2: #ff8a3b; --c3: #a10d0d; --tint: rgba(255, 45, 45, 0.13); }
+    .btn-ch .link-icon { background: linear-gradient(135deg, #ff3b3b, #7a0d0d); }
     .btn-ch:hover, .btn-ch:active {
-      border-color: rgba(140, 120, 255, 0.55);
-      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.5), 0 0 28px rgba(140, 120, 255, 0.3);
+      border-color: rgba(255, 59, 59, 0.55);
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 45, 45, 0.4);
     }
 
     .link-sub { display: block; font-size: 11px; font-weight: 300; color: var(--text-dim); letter-spacing: 0.5px; margin-top: 1px; }
     .link-btn .chev { margin-left: auto; color: var(--text-dim); font-size: 20px; font-weight: 300; transition: transform 0.25s ease, color 0.25s ease; }
     .link-btn:hover .chev { transform: translateX(4px); color: var(--text); }
 
+    /* ---------- Latest channel post ---------- */
+    .latest-card {
+      --d: 0.22s;
+      display: block;
+      width: 100%;
+      border-radius: 18px;
+      padding: 11px 15px 12px;
+      background: linear-gradient(135deg, rgba(255, 45, 45, 0.10), rgba(255, 255, 255, 0.03));
+      border: 1px solid rgba(255, 70, 70, 0.30);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      color: var(--text);
+      text-decoration: none;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), 0 0 22px rgba(255, 45, 45, 0.10);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.25s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+
+    .latest-card:hover, .latest-card:active {
+      transform: translateY(-2px);
+      border-color: rgba(255, 70, 70, 0.55);
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 45, 45, 0.28);
+    }
+
+    .latest-head {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 2.5px;
+      color: #ff6b6b;
+      margin-bottom: 6px;
+    }
+
+    .live-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #ff3b3b;
+      box-shadow: 0 0 10px #ff3b3b;
+      animation: blink 1.6s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes blink { 50% { opacity: 0.3; } }
+
+    .latest-time { margin-left: auto; color: var(--text-dim); letter-spacing: 1px; font-weight: 300; }
+
+    .latest-text {
+      font-size: 13px;
+      font-weight: 300;
+      line-height: 1.55;
+      color: var(--text);
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      word-break: break-word;
+    }
+
+    .latest-text a { color: #ff8a8a; text-decoration: underline; }
+
     /* ---------- Visitor counter ---------- */
     .visits {
-      --d: 0.34s;
+      --d: 0.38s;
       display: none;
       align-items: center;
       gap: 9px;
@@ -449,7 +541,7 @@
     .visits b { color: var(--text); font-weight: 500; font-variant-numeric: tabular-nums; }
 
     .footer {
-      --d: 0.42s;
+      --d: 0.46s;
       font-family: var(--display);
       font-size: 9px;
       font-weight: 500;
@@ -519,6 +611,11 @@
         <audio id="audio" src="blockkids.mp3" preload="auto" loop></audio>
       </div>
 
+      <a class="latest-card" id="latestCard" href="https://t.me/Playlist_mp" target="_blank" rel="noopener" style="display:none">
+        <div class="latest-head"><span class="live-dot"></span> LATEST FROM STRUGGLE <span class="latest-time" id="latestTime"></span></div>
+        <p class="latest-text" id="latestText"></p>
+      </a>
+
       <div class="links">
         <a class="link-btn btn-ig" href="https://instagram.com/sinamp606" target="_blank" rel="noopener">
           <span class="link-icon">
@@ -538,7 +635,7 @@
           <span class="link-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>
           </span>
-          <span>Channel<span class="link-sub">Playlist_mp</span></span>
+          <span>Struggle<span class="link-sub">t.me/Playlist_mp</span></span>
           <span class="chev">›</span>
         </a>
       </div>
@@ -577,6 +674,36 @@
           }
         })
         .catch(function () { /* counter stays hidden */ });
+    })();
+
+    // Latest Struggle channel post (synced every ~15 min by GitHub Action)
+    (function () {
+      function esc(s) {
+        return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      }
+      function linkify(s) {
+        return esc(s).replace(/(https?:\/\/[^\s<]+|t\.me\/[^\s<]+)/g, function (u) {
+          var href = /^https?:\/\//.test(u) ? u : 'https://' + u;
+          return '<a href="' + href + '" target="_blank" rel="noopener">' + u + '</a>';
+        }).replace(/\n/g, '<br>');
+      }
+      function ago(iso) {
+        var mins = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60000));
+        if (mins < 1) return 'just now';
+        if (mins < 60) return mins + 'm ago';
+        var h = Math.round(mins / 60);
+        if (h < 24) return h + 'h ago';
+        return Math.round(h / 24) + 'd ago';
+      }
+      fetch('channel.json', { cache: 'no-store' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (d) {
+          if (!d || !d.text) return;
+          document.getElementById('latestText').innerHTML = linkify(d.text);
+          if (d.updated_at) document.getElementById('latestTime').textContent = ago(d.updated_at);
+          document.getElementById('latestCard').style.display = 'block';
+        })
+        .catch(function () { /* card stays hidden */ });
     })();
 
     const enter = document.getElementById('enter');
