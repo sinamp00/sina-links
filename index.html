@@ -7,7 +7,7 @@
   <link rel="icon" href="profile.jpg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Unbounded:wght@500;600;700&display=swap" rel="stylesheet" />
   <link rel="preload" href="blockkids.mp3" as="audio" />
 
   <meta property="og:title" content="SıNa" />
@@ -24,6 +24,7 @@
       --text-dim: #a9a9b4;
       --glass: rgba(255, 255, 255, 0.06);
       --glass-border: rgba(255, 255, 255, 0.12);
+      --display: 'Unbounded', 'Poppins', sans-serif;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -46,7 +47,7 @@
       height: 100%;
       object-fit: cover;
       z-index: -2;
-      filter: saturate(1.1);
+      filter: saturate(1.15);
     }
 
     .bg-overlay {
@@ -55,7 +56,7 @@
       z-index: -1;
       background:
         radial-gradient(ellipse at 50% 20%, rgba(20, 16, 40, 0.25) 0%, transparent 60%),
-        linear-gradient(180deg, rgba(5, 5, 8, 0.62) 0%, rgba(5, 5, 8, 0.45) 40%, rgba(5, 5, 8, 0.78) 100%);
+        linear-gradient(180deg, rgba(5, 5, 8, 0.66) 0%, rgba(5, 5, 8, 0.5) 40%, rgba(5, 5, 8, 0.8) 100%);
     }
 
     /* ---------- Entry overlay (tap to enter -> autoplay) ---------- */
@@ -87,7 +88,12 @@
       box-shadow: 0 0 34px var(--accent-soft);
     }
 
-    .enter h2 { font-size: clamp(26px, 7vw, 34px); font-weight: 600; letter-spacing: 3px; }
+    .enter h2 {
+      font-family: var(--display);
+      font-size: clamp(24px, 6.5vw, 30px);
+      font-weight: 600;
+      letter-spacing: 2px;
+    }
 
     .enter-btn {
       position: relative;
@@ -97,10 +103,10 @@
       border: 1px solid var(--accent-soft);
       background: rgba(140, 120, 255, 0.12);
       color: var(--text);
-      font-family: inherit;
-      font-size: 15px;
+      font-family: var(--display);
+      font-size: 14px;
       font-weight: 500;
-      letter-spacing: 4px;
+      letter-spacing: 5px;
       cursor: pointer;
       transition: transform 0.25s ease, background 0.25s ease;
     }
@@ -160,18 +166,19 @@
     .avatar:hover { transform: scale(1.04); }
 
     h1 {
-      font-size: clamp(28px, 8vw, 34px);
+      font-family: var(--display);
+      font-size: clamp(26px, 7.5vw, 32px);
       font-weight: 700;
-      letter-spacing: 3px;
-      margin-top: 16px;
-      text-shadow: 0 2px 18px rgba(0, 0, 0, 0.6);
+      letter-spacing: 2px;
+      margin-top: 18px;
+      text-shadow: 0 2px 24px rgba(140, 120, 255, 0.45), 0 2px 18px rgba(0, 0, 0, 0.6);
     }
 
     .handle {
       font-size: 13px;
       font-weight: 300;
       color: var(--text-dim);
-      margin-top: 4px;
+      margin-top: 6px;
       letter-spacing: 2px;
     }
 
@@ -323,12 +330,36 @@
 
     .link-btn .chev { margin-left: auto; color: var(--text-dim); font-size: 18px; font-weight: 300; }
 
-    .footer {
-      margin-top: 34px;
-      font-size: 11px;
+    /* ---------- Visitor counter ---------- */
+    .visits {
+      display: none;
+      align-items: center;
+      gap: 9px;
+      margin-top: 24px;
+      padding: 10px 20px;
+      border-radius: 999px;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      font-size: 13px;
       font-weight: 300;
+      letter-spacing: 1.5px;
+      color: var(--text-dim);
+    }
+
+    .visits.show { display: inline-flex; }
+
+    .visits svg { width: 17px; height: 17px; color: var(--accent); }
+    .visits b { color: var(--text); font-weight: 500; font-variant-numeric: tabular-nums; }
+
+    .footer {
+      margin-top: 26px;
+      font-family: var(--display);
+      font-size: 10px;
+      font-weight: 500;
       color: rgba(255, 255, 255, 0.35);
-      letter-spacing: 4px;
+      letter-spacing: 6px;
     }
   </style>
 </head>
@@ -356,7 +387,7 @@
 
       <div class="player" id="player">
         <div class="player-top">
-          <img class="cover" src="profile.jpg" alt="cover" />
+          <img class="cover" src="cover.jpg" alt="BLOCKKIDS cover" />
           <div class="track-meta">
             <div class="track-title">BLOCKKIDS<span class="eq"><span></span><span></span><span></span><span></span></span></div>
             <div class="track-artist">THIZZY52</div>
@@ -388,7 +419,7 @@
         </a>
         <a class="link-btn" href="https://t.me/offdbit" target="_blank" rel="noopener">
           <span class="link-icon">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.9 4.6c.2-1-.7-1.7-1.7-1.4L2.7 9.7c-1 .4-1 1.9.1 2.2l4.5 1.4 1.7 5.4c.3 1 1.6 1.2 2.3.4l2.5-2.6 4.7 3.5c.8.6 2 .1 2.2-.9l2.2-14.5zM8.6 12.4l9.8-7.5c.2-.2.5.1.3.3l-8.1 8.9-.3 3-1.7-4.7z"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.9 4.6c.2-1-.7-1.7-1.4L2.7 9.7c-1 .4-1 1.9.1 2.2l4.5 1.4 1.7 5.4c.3 1 1.6 1.2 2.3.4l2.5-2.6 4.7 3.5c.8.6 2 .1 2.2-.9l2.2-14.5zM8.6 12.4l9.8-7.5c.2-.2.5.1.3.3l-8.1 8.9-.3 3-1.7-4.7z"/></svg>
           </span>
           Telegram
           <span class="chev">›</span>
@@ -400,6 +431,11 @@
           Channel
           <span class="chev">›</span>
         </a>
+      </div>
+
+      <div class="visits" id="visits">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        <span><b id="visitCount">–</b>&nbsp;visits</span>
       </div>
 
       <p class="footer">S I N A</p>
@@ -416,6 +452,21 @@
         i = (i + 1) % (t.length + 1);
         document.title = t.substring(0, i) || ' ';
       }, 350);
+    })();
+
+    // Visitor counter (Abacus - free, no signup)
+    (function () {
+      const pill = document.getElementById('visits');
+      const num = document.getElementById('visitCount');
+      fetch('https://abacus.jasoncameron.dev/hit/sina-links/visits')
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          if (d && typeof d.value === 'number') {
+            num.textContent = d.value.toLocaleString('en-US');
+            pill.classList.add('show');
+          }
+        })
+        .catch(function () { /* counter stays hidden */ });
     })();
 
     const enter = document.getElementById('enter');
