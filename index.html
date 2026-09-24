@@ -2,11 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#050507" />
   <link rel="icon" href="profile.jpg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="preload" href="blockkids.mp3" as="audio" />
 
   <meta property="og:title" content="SıNa" />
   <meta property="og:description" content="SıNa — links" />
@@ -14,194 +16,471 @@
 
   <title>SıNa</title>
 
-  <script>
-    // Animated tab title (typing effect)
-    document.addEventListener('DOMContentLoaded', function () {
-      const originalTitle = 'SıNa';
-      let index = 0;
-      setInterval(function () {
-        index = (index + 1) % (originalTitle.length + 1);
-        document.title = originalTitle.substring(0, index) || ' ';
-      }, 350);
-    });
-  </script>
-
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --accent: #8c78ff;
+      --accent-soft: rgba(140, 120, 255, 0.35);
+      --text: #f4f4f7;
+      --text-dim: #a9a9b4;
+      --glass: rgba(255, 255, 255, 0.06);
+      --glass-border: rgba(255, 255, 255, 0.12);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    html, body { height: 100%; }
 
     body {
-      font-family: 'Poppins', sans-serif;
-      background: radial-gradient(ellipse at 50% 0%, #16161d 0%, #0a0a0e 55%, #050507 100%);
-      color: #f2f2f5;
-      min-height: 100vh;
+      font-family: 'Poppins', system-ui, sans-serif;
+      background: #050507;
+      color: var(--text);
+      overflow-x: hidden;
+      min-height: 100dvh;
+    }
+
+    /* ---------- Background video ---------- */
+    .bg-video {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -2;
+      filter: saturate(1.1);
+    }
+
+    .bg-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background:
+        radial-gradient(ellipse at 50% 20%, rgba(20, 16, 40, 0.25) 0%, transparent 60%),
+        linear-gradient(180deg, rgba(5, 5, 8, 0.62) 0%, rgba(5, 5, 8, 0.45) 40%, rgba(5, 5, 8, 0.78) 100%);
+    }
+
+    /* ---------- Entry overlay (tap to enter -> autoplay) ---------- */
+    .enter {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 26px;
+      background: rgba(5, 5, 8, 0.55);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      transition: opacity 0.7s ease, visibility 0.7s;
+      cursor: pointer;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .enter.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+    .enter img {
+      width: 96px; height: 96px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--glass-border);
+      box-shadow: 0 0 34px var(--accent-soft);
+    }
+
+    .enter h2 { font-size: clamp(26px, 7vw, 34px); font-weight: 600; letter-spacing: 3px; }
+
+    .enter-btn {
+      position: relative;
+      margin-top: 6px;
+      padding: 16px 54px;
+      border-radius: 999px;
+      border: 1px solid var(--accent-soft);
+      background: rgba(140, 120, 255, 0.12);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: 4px;
+      cursor: pointer;
+      transition: transform 0.25s ease, background 0.25s ease;
+    }
+
+    .enter-btn::after {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: 999px;
+      border: 1px solid var(--accent);
+      opacity: 0.7;
+      animation: pulse 2s ease-out infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 0.7; }
+      100% { transform: scale(1.25); opacity: 0; }
+    }
+
+    .enter-btn:active { transform: scale(0.96); }
+    .enter small { color: var(--text-dim); font-size: 12px; letter-spacing: 1px; font-weight: 300; }
+
+    /* ---------- Main layout ---------- */
+    .page {
+      min-height: 100dvh;
       display: flex;
       justify-content: center;
-      align-items: flex-start;
-      padding: 56px 20px 64px;
+      padding:
+        calc(48px + env(safe-area-inset-top)) 20px
+        calc(40px + env(safe-area-inset-bottom));
     }
 
     .card {
       width: 100%;
       max-width: 420px;
-      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       animation: fadeUp 0.9s ease both;
     }
 
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(18px); }
-      to   { opacity: 1; transform: translateY(0); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .avatar {
-      width: 128px;
-      height: 128px;
+      width: clamp(104px, 28vw, 128px);
+      height: clamp(104px, 28vw, 128px);
       border-radius: 50%;
       object-fit: cover;
-      border: 3px solid rgba(255, 255, 255, 0.14);
-      box-shadow: 0 0 42px rgba(140, 120, 255, 0.28), 0 8px 28px rgba(0, 0, 0, 0.55);
-      transition: transform 0.35s ease, box-shadow 0.35s ease;
+      border: 3px solid rgba(255, 255, 255, 0.16);
+      box-shadow: 0 0 44px var(--accent-soft), 0 10px 30px rgba(0, 0, 0, 0.55);
+      transition: transform 0.35s ease;
     }
 
-    .avatar:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 60px rgba(140, 120, 255, 0.45), 0 8px 28px rgba(0, 0, 0, 0.55);
-    }
+    .avatar:hover { transform: scale(1.04); }
 
     h1 {
-      font-size: 30px;
-      font-weight: 600;
-      letter-spacing: 2px;
-      margin-top: 18px;
+      font-size: clamp(28px, 8vw, 34px);
+      font-weight: 700;
+      letter-spacing: 3px;
+      margin-top: 16px;
+      text-shadow: 0 2px 18px rgba(0, 0, 0, 0.6);
     }
 
     .handle {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 300;
-      color: #9a9aa5;
+      color: var(--text-dim);
       margin-top: 4px;
-      letter-spacing: 1px;
+      letter-spacing: 2px;
     }
 
+    /* ---------- Player ---------- */
+    .player {
+      width: 100%;
+      margin-top: 28px;
+      border-radius: 20px;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      padding: 16px;
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.45);
+    }
+
+    .player-top { display: flex; align-items: center; gap: 14px; }
+
+    .cover {
+      width: 56px; height: 56px;
+      border-radius: 14px;
+      object-fit: cover;
+      flex-shrink: 0;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+    }
+
+    .track-meta { flex: 1; min-width: 0; text-align: left; }
+    .track-title { font-size: 15px; font-weight: 600; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .track-artist { font-size: 12px; font-weight: 300; color: var(--text-dim); letter-spacing: 1.5px; margin-top: 2px; }
+
+    .eq { display: inline-flex; align-items: flex-end; gap: 3px; height: 18px; margin-left: 8px; vertical-align: middle; }
+    .eq span { width: 3px; background: var(--accent); border-radius: 2px; height: 40%; transition: height 0.3s; }
+    .playing .eq span { animation: eq 0.9s ease-in-out infinite; }
+    .eq span:nth-child(2) { animation-delay: 0.15s !important; }
+    .eq span:nth-child(3) { animation-delay: 0.3s !important; }
+    .eq span:nth-child(4) { animation-delay: 0.45s !important; }
+    @keyframes eq {
+      0%, 100% { height: 30%; }
+      50% { height: 100%; }
+    }
+
+    .play-btn {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      border: none;
+      flex-shrink: 0;
+      background: linear-gradient(135deg, #9a86ff, #6c5ce7);
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 20px rgba(140, 120, 255, 0.45);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .play-btn:active { transform: scale(0.93); }
+    .play-btn svg { width: 22px; height: 22px; }
+    .play-btn .icon-pause { display: none; }
+    .playing .play-btn .icon-play { display: none; }
+    .playing .play-btn .icon-pause { display: block; }
+
+    .progress-wrap { margin-top: 14px; }
+    .progress {
+      height: 5px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.14);
+      cursor: pointer;
+      position: relative;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #9a86ff, #6c5ce7);
+      position: relative;
+    }
+    .progress-fill::after {
+      content: '';
+      position: absolute;
+      right: -6px; top: 50%;
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      background: #fff;
+      transform: translateY(-50%);
+      box-shadow: 0 0 10px rgba(140, 120, 255, 0.8);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .progress:active .progress-fill::after { opacity: 1; }
+
+    .time-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 8px;
+      font-size: 11px;
+      font-weight: 300;
+      color: var(--text-dim);
+      letter-spacing: 1px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ---------- Links ---------- */
     .links {
+      width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 14px;
-      margin-top: 34px;
+      gap: 13px;
+      margin-top: 26px;
     }
 
     .link-btn {
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 12px;
-      padding: 15px 20px;
-      border-radius: 16px;
-      background: rgba(255, 255, 255, 0.055);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: #f2f2f5;
+      gap: 14px;
+      padding: 16px 18px;
+      border-radius: 18px;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      color: var(--text);
       text-decoration: none;
       font-size: 16px;
       font-weight: 400;
       letter-spacing: 0.5px;
-      backdrop-filter: blur(8px);
       transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
     }
 
-    .link-btn:hover {
-      transform: translateY(-2px) scale(1.015);
+    .link-btn:hover, .link-btn:active {
+      transform: translateY(-2px);
       background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(140, 120, 255, 0.55);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), 0 0 22px rgba(140, 120, 255, 0.18);
+      border-color: var(--accent-soft);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5), 0 0 24px rgba(140, 120, 255, 0.15);
     }
 
-    .link-btn svg {
-      width: 22px;
-      height: 22px;
-      flex-shrink: 0;
-    }
-
-    .player {
-      margin-top: 34px;
-      border-radius: 18px;
-      overflow: hidden;
-      background: rgba(255, 255, 255, 0.045);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(8px);
-    }
-
-    .player-label {
+    .link-icon {
+      width: 42px; height: 42px;
+      border-radius: 13px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      padding: 14px 16px 10px;
-      font-size: 14px;
-      font-weight: 500;
-      letter-spacing: 0.5px;
-      color: #d8d8e0;
+      background: rgba(140, 120, 255, 0.14);
+      border: 1px solid rgba(140, 120, 255, 0.25);
+      flex-shrink: 0;
     }
 
-    .eq { display: inline-flex; align-items: flex-end; gap: 3px; height: 16px; }
-    .eq span { width: 3px; background: #8c78ff; border-radius: 2px; animation: eq 1s ease-in-out infinite; }
-    .eq span:nth-child(1) { height: 60%; animation-delay: 0s; }
-    .eq span:nth-child(2) { height: 100%; animation-delay: 0.2s; }
-    .eq span:nth-child(3) { height: 45%; animation-delay: 0.4s; }
-    .eq span:nth-child(4) { height: 80%; animation-delay: 0.1s; }
-    @keyframes eq {
-      0%, 100% { transform: scaleY(0.6); }
-      50% { transform: scaleY(1); }
-    }
+    .link-icon svg { width: 21px; height: 21px; }
 
-    .player iframe {
-      display: block;
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      border: 0;
-    }
+    .link-btn .chev { margin-left: auto; color: var(--text-dim); font-size: 18px; font-weight: 300; }
 
     .footer {
-      margin-top: 36px;
-      font-size: 12px;
+      margin-top: 34px;
+      font-size: 11px;
       font-weight: 300;
-      color: #6d6d78;
-      letter-spacing: 2px;
+      color: rgba(255, 255, 255, 0.35);
+      letter-spacing: 4px;
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <img class="avatar" src="profile.jpg" alt="SıNa" />
 
-    <h1>SıNa</h1>
-    <p class="handle">@sinamp606</p>
+  <video class="bg-video" autoplay muted loop playsinline preload="auto" poster="profile.jpg">
+    <source src="bg.mp4" type="video/mp4" />
+  </video>
+  <div class="bg-overlay"></div>
 
-    <div class="links">
-      <a class="link-btn" href="https://instagram.com/sinamp606" target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-        Instagram
-      </a>
-      <a class="link-btn" href="https://t.me/offdbit" target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.9 4.6c.2-1-.7-1.7-1.7-1.4L2.7 9.7c-1 .4-1 1.9.1 2.2l4.5 1.4 1.7 5.4c.3 1 1.6 1.2 2.3.4l2.5-2.6 4.7 3.5c.8.6 2 .1 2.2-.9l2.2-14.5zM8.6 12.4l9.8-7.5c.2-.2.5.1.3.3l-8.1 8.9-.3 3-1.7-4.7z"/></svg>
-        Telegram
-      </a>
-      <a class="link-btn" href="https://t.me/Playlist_mp" target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>
-        Channel
-      </a>
-    </div>
-
-    <div class="player">
-      <div class="player-label">
-        <span class="eq"><span></span><span></span><span></span><span></span></span>
-        THIZZY52 — BLOCKKIDS
-      </div>
-      <iframe src="https://www.youtube.com/embed/41TEL690PnI?rel=0"
-              title="THIZZY52 - BLOCKKIDS"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowfullscreen></iframe>
-    </div>
-
-    <p class="footer">S I N A</p>
+  <!-- Tap-to-enter: enables autoplay with sound -->
+  <div class="enter" id="enter">
+    <img src="profile.jpg" alt="SıNa" />
+    <h2>SıNa</h2>
+    <button class="enter-btn" id="enterBtn">ENTER</button>
+    <small>TAP TO ENTER WITH SOUND</small>
   </div>
+
+  <main class="page">
+    <div class="card">
+
+      <img class="avatar" src="profile.jpg" alt="SıNa" />
+      <h1>SıNa</h1>
+      <p class="handle">@sinamp606</p>
+
+      <div class="player" id="player">
+        <div class="player-top">
+          <img class="cover" src="profile.jpg" alt="cover" />
+          <div class="track-meta">
+            <div class="track-title">BLOCKKIDS<span class="eq"><span></span><span></span><span></span><span></span></span></div>
+            <div class="track-artist">THIZZY52</div>
+          </div>
+          <button class="play-btn" id="playBtn" aria-label="Play / pause">
+            <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14v13.72c0 .8.87 1.3 1.56.88l10.5-6.86a1.03 1.03 0 0 0 0-1.76L9.56 4.26A1.03 1.03 0 0 0 8 5.14z"/></svg>
+            <svg class="icon-pause" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1.2"/><rect x="14" y="4" width="4" height="16" rx="1.2"/></svg>
+          </button>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress" id="progress">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+          <div class="time-row">
+            <span id="curTime">0:00</span>
+            <span id="durTime">0:00</span>
+          </div>
+        </div>
+        <audio id="audio" src="blockkids.mp3" preload="auto" loop></audio>
+      </div>
+
+      <div class="links">
+        <a class="link-btn" href="https://instagram.com/sinamp606" target="_blank" rel="noopener">
+          <span class="link-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          </span>
+          Instagram
+          <span class="chev">›</span>
+        </a>
+        <a class="link-btn" href="https://t.me/offdbit" target="_blank" rel="noopener">
+          <span class="link-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.9 4.6c.2-1-.7-1.7-1.7-1.4L2.7 9.7c-1 .4-1 1.9.1 2.2l4.5 1.4 1.7 5.4c.3 1 1.6 1.2 2.3.4l2.5-2.6 4.7 3.5c.8.6 2 .1 2.2-.9l2.2-14.5zM8.6 12.4l9.8-7.5c.2-.2.5.1.3.3l-8.1 8.9-.3 3-1.7-4.7z"/></svg>
+          </span>
+          Telegram
+          <span class="chev">›</span>
+        </a>
+        <a class="link-btn" href="https://t.me/Playlist_mp" target="_blank" rel="noopener">
+          <span class="link-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>
+          </span>
+          Channel
+          <span class="chev">›</span>
+        </a>
+      </div>
+
+      <p class="footer">S I N A</p>
+
+    </div>
+  </main>
+
+  <script>
+    // Animated tab title
+    (function () {
+      const t = 'SıNa';
+      let i = 0;
+      setInterval(function () {
+        i = (i + 1) % (t.length + 1);
+        document.title = t.substring(0, i) || ' ';
+      }, 350);
+    })();
+
+    const enter = document.getElementById('enter');
+    const player = document.getElementById('player');
+    const audio = document.getElementById('audio');
+    const playBtn = document.getElementById('playBtn');
+    const progress = document.getElementById('progress');
+    const progressFill = document.getElementById('progressFill');
+    const curTime = document.getElementById('curTime');
+    const durTime = document.getElementById('durTime');
+
+    function fmt(s) {
+      if (!isFinite(s)) return '0:00';
+      const m = Math.floor(s / 60);
+      const sec = Math.floor(s % 60);
+      return m + ':' + String(sec).padStart(2, '0');
+    }
+
+    function setPlaying(on) {
+      player.classList.toggle('playing', on);
+    }
+
+    function play() {
+      audio.play().then(function () { setPlaying(true); }).catch(function () { setPlaying(false); });
+    }
+
+    function pause() {
+      audio.pause();
+      setPlaying(false);
+    }
+
+    // Tap to enter -> start music automatically
+    enter.addEventListener('click', function () {
+      enter.classList.add('hidden');
+      play();
+    });
+
+    playBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (audio.paused) play(); else pause();
+    });
+
+    audio.addEventListener('timeupdate', function () {
+      if (audio.duration) {
+        progressFill.style.width = (audio.currentTime / audio.duration * 100) + '%';
+      }
+      curTime.textContent = fmt(audio.currentTime);
+    });
+
+    audio.addEventListener('loadedmetadata', function () {
+      durTime.textContent = fmt(audio.duration);
+    });
+
+    audio.addEventListener('play', function () { setPlaying(true); });
+    audio.addEventListener('pause', function () { setPlaying(false); });
+
+    // Seek
+    function seek(e) {
+      const rect = progress.getBoundingClientRect();
+      const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+      const ratio = Math.min(Math.max(x / rect.width, 0), 1);
+      if (audio.duration) audio.currentTime = ratio * audio.duration;
+    }
+    progress.addEventListener('click', seek);
+    progress.addEventListener('touchstart', function (e) { seek(e); }, { passive: true });
+  </script>
 </body>
 </html>
