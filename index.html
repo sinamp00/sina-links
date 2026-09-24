@@ -225,16 +225,12 @@
       font-size: clamp(25px, 7vw, 31px);
       font-weight: 800;
       letter-spacing: 2px;
-      background: linear-gradient(100deg, #ffffff 15%, #b9b3ff 38%, #ec9ecb 55%, #ffffff 78%);
+      background: linear-gradient(180deg, #ffffff 25%, #b9b3ff 100%);
       -webkit-background-clip: text;
       background-clip: text;
-      background-size: 220% auto;
-      animation: name-shimmer 7s linear infinite;
       color: transparent;
       filter: drop-shadow(0 2px 22px rgba(140, 120, 255, 0.45));
     }
-
-    @keyframes name-shimmer { to { background-position: 220% center; } }
 
     .handle {
       font-size: 12px;
@@ -372,6 +368,15 @@
       font-weight: 700;
       letter-spacing: 0.5px;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .track-title .marquee-inner { display: inline-block; will-change: transform; }
+    /* scroll the title while playing when it doesn't fit, so the full name shows */
+    .playing .track-title.scroll .marquee-inner {
+      animation: marquee var(--marquee-dur, 6s) linear infinite;
+    }
+    @keyframes marquee {
+      0%, 12% { transform: translateX(0); }
+      88%, 100% { transform: translateX(var(--scroll-x, -40px)); }
     }
     .playing .track-title {
       background: linear-gradient(90deg, #fff, #b388ff, #ec4899, #fff);
@@ -717,7 +722,7 @@
           <div class="cover-wrap"><img class="cover" src="cover.jpg" alt="BLOCKKIDS cover" /></div>
           <div class="track-meta">
             <div class="now-playing"><span class="np-dot"></span>NOW PLAYING</div>
-            <div class="track-title">BLOCKKIDS</div>
+            <div class="track-title"><span class="marquee-inner">BLOCKKIDS</span></div>
             <div class="track-artist">THIZZY52</div>
             <div class="eq"><span></span><span></span><span></span><span></span><span></span></div>
           </div>
@@ -867,6 +872,23 @@
       e.stopPropagation();
       if (audio.duration) audio.currentTime = Math.min(audio.duration, audio.currentTime + 10);
     });
+
+    // Marquee the track title while playing when it overflows, so the full name is visible
+    const trackTitle = document.querySelector('.track-title');
+    const marqueeInner = trackTitle.querySelector('.marquee-inner');
+    function fitTitle() {
+      const overflow = marqueeInner.scrollWidth - trackTitle.clientWidth;
+      if (overflow > 4) {
+        trackTitle.classList.add('scroll');
+        marqueeInner.style.setProperty('--scroll-x', (-overflow) + 'px');
+        marqueeInner.style.setProperty('--marquee-dur', Math.max(4, marqueeInner.scrollWidth / 45) + 's');
+      } else {
+        trackTitle.classList.remove('scroll');
+      }
+    }
+    window.addEventListener('resize', fitTitle);
+    if (document.fonts && document.fonts.ready) { document.fonts.ready.then(fitTitle); }
+    fitTitle();
 
     audio.addEventListener('timeupdate', function () {
       if (audio.duration) {
